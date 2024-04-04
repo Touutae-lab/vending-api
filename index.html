@@ -1,0 +1,957 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>handler: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/touutae-lab/vending-api/internal/handler/machine_handler.go (0.0%)</option>
+				
+				<option value="file1">github.com/touutae-lab/vending-api/internal/handler/product_handler.go (30.9%)</option>
+				
+				<option value="file2">github.com/touutae-lab/vending-api/internal/lib/hashing_provider.go (83.3%)</option>
+				
+				<option value="file3">github.com/touutae-lab/vending-api/internal/lib/jwt_provider.go (34.7%)</option>
+				
+				<option value="file4">github.com/touutae-lab/vending-api/internal/repository/machine_repository_impl.go (0.0%)</option>
+				
+				<option value="file5">github.com/touutae-lab/vending-api/internal/repository/product_repository_impl.go (0.0%)</option>
+				
+				<option value="file6">github.com/touutae-lab/vending-api/internal/repository/user_login_repository_impl.go (0.0%)</option>
+				
+				<option value="file7">github.com/touutae-lab/vending-api/internal/service/machine_service_impl.go (81.2%)</option>
+				
+				<option value="file8">github.com/touutae-lab/vending-api/internal/service/product_service_impl.go (86.7%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package handler
+
+import (
+        "database/sql"
+        "errors"
+        "github.com/gin-gonic/gin"
+        "github.com/touutae-lab/vending-api/internal/lib"
+        "github.com/touutae-lab/vending-api/internal/service"
+        "golang.org/x/net/context"
+        "strconv"
+)
+
+type MachineHandler struct {
+        Context *context.Context
+        Service service.MachineService
+}
+
+func NewMachineHandler(ctx *context.Context, service service.MachineService) *MachineHandler <span class="cov0" title="0">{
+        return &amp;MachineHandler{
+                Context: ctx,
+                Service: service,
+        }
+}</span>
+
+func (h *MachineHandler) RegisterRoute(router *gin.Engine) <span class="cov0" title="0">{
+        api := router.Group("/machine")
+        api.Use(lib.JWTMachineAuthMiddleWare())
+        </span><span class="cov0" title="0">{
+                api.GET("/", h.GetAllMachine)
+                api.GET("/:id", h.GetMachineByID)
+        }</span>
+}
+
+func (h *MachineHandler) GetAllMachine(c *gin.Context) <span class="cov0" title="0">{
+        machines, err := h.Service.GetAllMachine(*h.Context)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(500, gin.H{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov0" title="0">c.JSON(200, machines)</span>
+}
+
+func (h *MachineHandler) GetMachineByID(c *gin.Context) <span class="cov0" title="0">{
+        idStr := c.Param("id")
+        id, err := strconv.ParseInt(idStr, 10, 32)
+
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, gin.H{"error": "Invalid ID format"})
+                return
+        }</span>
+
+        <span class="cov0" title="0">machine, err := h.Service.GetMachineByID(*h.Context, int32(id))
+        if err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov0" title="0">{
+                        c.JSON(404, gin.H{"error": "Machine not found"})
+                        return
+                }</span>
+                <span class="cov0" title="0">c.JSON(500, gin.H{"error": err.Error()})
+                return</span>
+        }
+        <span class="cov0" title="0">c.JSON(200, machine)</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package handler
+
+import (
+        "database/sql"
+        "errors"
+        "github.com/gin-gonic/gin"
+        "github.com/touutae-lab/vending-api/internal/dto"
+        "github.com/touutae-lab/vending-api/internal/lib"
+        "github.com/touutae-lab/vending-api/internal/service"
+        "golang.org/x/net/context"
+        "net/http"
+        "strconv"
+)
+
+type ProductHandler struct {
+        Context *context.Context
+        Service service.ProductService
+}
+
+func NewProductHandler(ctx *context.Context, productService service.ProductService) *ProductHandler <span class="cov8" title="1">{
+        return &amp;ProductHandler{
+                Context: ctx,
+                Service: productService,
+        }
+}</span>
+
+func (h *ProductHandler) RegisterRoute(router *gin.Engine) <span class="cov8" title="1">{
+        api := router.Group("/product")
+        api.Use(lib.JWTAuthMiddleWare())
+        </span><span class="cov8" title="1">{
+                api.GET("/", h.GetAllProduct)
+                api.GET("/:id", h.GetProductByID)
+                api.POST("/", h.CreateProduct)
+                api.PUT("/", h.UpdateProduct)
+                api.DELETE("/:id", h.DeleteProduct)
+        }</span>
+}
+
+func (h *ProductHandler) GetAllProduct(c *gin.Context) <span class="cov8" title="1">{
+        products, err := h.Service.GetAllProduct(*h.Context)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov8" title="1">c.JSON(http.StatusOK, products)</span>
+}
+
+func (h *ProductHandler) GetProductByID(c *gin.Context) <span class="cov0" title="0">{
+        idStr := c.Param("id")
+        id, err := strconv.ParseInt(idStr, 10, 32)
+
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+                return
+        }</span>
+
+        <span class="cov0" title="0">product, err := h.Service.GetProductByID(*h.Context, int32(id))
+        if err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+                        return
+                }</span>
+                <span class="cov0" title="0">c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+                return</span>
+
+        }
+        <span class="cov0" title="0">c.JSON(http.StatusOK, product)</span>
+}
+
+func (h *ProductHandler) CreateProduct(c *gin.Context) <span class="cov8" title="1">{
+        var productDTO dto.ProductDTO
+        if err := c.BindJSON(&amp;productDTO); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+                return
+        }</span>
+
+        <span class="cov8" title="1">id, err := h.Service.CreateProduct(*h.Context, productDTO)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov8" title="1">c.JSON(http.StatusCreated, gin.H{"id": id})</span>
+}
+
+func (h *ProductHandler) UpdateProduct(c *gin.Context) <span class="cov0" title="0">{
+        var productDTO dto.ProductDTO
+        if err := c.BindJSON(&amp;productDTO); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+                return
+        }</span>
+
+        <span class="cov0" title="0">id, err := h.Service.UpdateProduct(*h.Context, productDTO)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov0" title="0">c.JSON(http.StatusOK, gin.H{"id": id})</span>
+}
+
+func (h *ProductHandler) DeleteProduct(c *gin.Context) <span class="cov0" title="0">{
+        idStr := c.Param("id")
+        id, err := strconv.ParseInt(idStr, 10, 32)
+
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+                return
+        }</span>
+
+        <span class="cov0" title="0">rowsAffected, err := h.Service.DeleteProduct(*h.Context, int32(id))
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov0" title="0">c.JSON(http.StatusOK, gin.H{"rows_affected": rowsAffected})</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package lib
+
+import "golang.org/x/crypto/bcrypt"
+
+func HashPassword(password string) (string, error) <span class="cov8" title="1">{
+        hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">return string(hash), nil</span>
+}
+
+func CheckPasswordHash(password, hash string) bool <span class="cov8" title="1">{
+        err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+        return err == nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package lib
+
+import (
+        "errors"
+        "fmt"
+        "github.com/gin-gonic/gin"
+        "github.com/golang-jwt/jwt/v5"
+        "github.com/google/uuid"
+        "net/http"
+        "os"
+        "strings"
+        "time"
+)
+
+type JWTClaims struct {
+        Username string `json:"username"`
+        Role     string `json:"role"`
+        jwt.RegisteredClaims
+}
+
+type JWTMachineClaims struct {
+        MachineID uuid.UUID `json:"machine_id"`
+        jwt.RegisteredClaims
+}
+
+func GenerateMachineJWT(machineID uuid.UUID) (string, error) <span class="cov8" title="1">{
+        expirationTime := time.Now().Add(5 * time.Minute)
+
+        claims := JWTMachineClaims{
+                MachineID: machineID,
+                RegisteredClaims: jwt.RegisteredClaims{
+                        ExpiresAt: jwt.NewNumericDate(expirationTime),
+                },
+        }
+
+        token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+        tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">return tokenString, nil</span>
+}
+
+func VerifyMachineJWT(tokenString string) (*JWTMachineClaims, error) <span class="cov8" title="1">{
+        token, err := jwt.ParseWithClaims(tokenString, &amp;JWTMachineClaims{}, func(token *jwt.Token) (interface{}, error) </span><span class="cov8" title="1">{
+                if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+                }</span>
+
+                <span class="cov8" title="1">return []byte(os.Getenv("JWT_SECRET")), nil</span>
+        })
+
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if claims, ok := token.Claims.(*JWTMachineClaims); ok &amp;&amp; token.Valid </span><span class="cov8" title="1">{
+                if time.Now().After(claims.ExpiresAt.Time) </span><span class="cov0" title="0">{
+                        return nil, errors.New("token is expired")
+                }</span>
+
+                <span class="cov8" title="1">return claims, nil</span>
+        } else<span class="cov0" title="0"> {
+                return nil, errors.New("invalid token")
+        }</span>
+}
+
+func GenerateJWT(username string, role string) (string, error) <span class="cov8" title="1">{
+        expirationTime := time.Now().Add(5 * time.Minute)
+
+        claims := JWTClaims{
+                Username: username,
+                Role:     role,
+                RegisteredClaims: jwt.RegisteredClaims{
+                        ExpiresAt: jwt.NewNumericDate(expirationTime),
+                },
+        }
+
+        token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+        tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">return tokenString, nil</span>
+}
+
+func VerifyJWT(tokenString string) (*JWTClaims, error) <span class="cov8" title="1">{
+        token, err := jwt.ParseWithClaims(tokenString, &amp;JWTClaims{}, func(token *jwt.Token) (interface{}, error) </span><span class="cov8" title="1">{
+                if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+                }</span>
+
+                <span class="cov8" title="1">return []byte(os.Getenv("JWT_SECRET")), nil</span>
+        })
+
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if claims, ok := token.Claims.(*JWTClaims); ok &amp;&amp; token.Valid </span><span class="cov8" title="1">{
+                if time.Now().After(claims.ExpiresAt.Time) </span><span class="cov0" title="0">{
+                        return nil, errors.New("token is expired")
+                }</span>
+
+                <span class="cov8" title="1">return claims, nil</span>
+        } else<span class="cov0" title="0"> {
+                return nil, errors.New("invalid token")
+        }</span>
+}
+
+func JWTAuthMiddleWare() gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                tokenString := c.GetHeader("Authorization")
+                if tokenString == "" </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token not provided"})
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">const bearerPrefix = "Bearer "
+                if strings.HasPrefix(tokenString, bearerPrefix) </span><span class="cov0" title="0">{
+                        tokenString = strings.TrimPrefix(tokenString, bearerPrefix)
+                }</span> else<span class="cov0" title="0"> {
+                        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization header format"})
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">claims, err := VerifyJWT(tokenString)
+                if err != nil </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token", "details": err.Error()})
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">c.Set("username", claims.Username)
+                c.Set("role", claims.Role)
+
+                c.Next()</span>
+        }
+}
+
+func JWTMachineAuthMiddleWare() gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                tokenString := c.GetHeader("Authorization")
+                if tokenString == "" </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token not provided"})
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">const bearerPrefix = "Bearer "
+                if strings.HasPrefix(tokenString, bearerPrefix) </span><span class="cov0" title="0">{
+                        tokenString = strings.TrimPrefix(tokenString, bearerPrefix)
+                }</span> else<span class="cov0" title="0"> {
+                        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization header format"})
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">claims, err := VerifyMachineJWT(tokenString)
+                if err != nil </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token", "details": err.Error()})
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">c.Set("machine_id", claims.MachineID)
+                c.Next()</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package repository
+
+import (
+        "context"
+        "database/sql"
+        "github.com/go-jet/jet/v2/postgres"
+        "github.com/google/uuid"
+        "github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/model"
+        "github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/table"
+)
+
+type MachineRepositoryImpl struct {
+        db *sql.DB
+}
+
+func NewMachineRepository(db *sql.DB) *MachineRepositoryImpl <span class="cov0" title="0">{
+        return &amp;MachineRepositoryImpl{
+                db: db,
+        }
+}</span>
+
+func (mr *MachineRepositoryImpl) InsertMachine(ctx context.Context, machine *model.Machine) (int64, error) <span class="cov0" title="0">{
+        query := table.Machine.INSERT(
+                table.Machine.UUID,
+                table.Machine.TypeID,
+                table.Machine.Location,
+                table.Machine.Status,
+                table.Machine.StorageDetails,
+        ).VALUES(
+                machine.UUID,
+                machine.TypeID,
+                machine.Location,
+                machine.Status,
+                machine.StorageDetails,
+        ).RETURNING(
+                table.Machine.UUID,
+        )
+
+        queryString, args := query.Sql()
+
+        result, err := mr.db.ExecContext(ctx, queryString, args...)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+
+        <span class="cov0" title="0">return result.RowsAffected()</span>
+}
+
+func (mr *MachineRepositoryImpl) GetMachineByUUID(ctx context.Context, uuid uuid.UUID) (model.Machine, error) <span class="cov0" title="0">{
+        query := table.Machine.SELECT(
+                table.Machine.AllColumns,
+        ).WHERE(
+                table.Machine.UUID.EQ(postgres.UUID(uuid)),
+        ).LIMIT(1)
+
+        queryString, args := query.Sql()
+        row := mr.db.QueryRowContext(ctx, queryString, args...)
+
+        var machine model.Machine
+        if err := row.Scan(&amp;machine.UUID, &amp;machine.TypeID, &amp;machine.Location, &amp;machine.Status, &amp;machine.StorageDetails); err != nil </span><span class="cov0" title="0">{
+                return model.Machine{}, err
+        }</span>
+
+        <span class="cov0" title="0">return machine, nil</span>
+}
+
+func (mr *MachineRepositoryImpl) GetAllMachine(ctx context.Context) ([]model.Machine, error) <span class="cov0" title="0">{
+        query := table.Machine.SELECT(
+                table.Machine.AllColumns,
+        )
+
+        queryString, args := query.Sql()
+        rows, err := mr.db.QueryContext(ctx, queryString, args...)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">defer rows.Close()
+
+        var machines []model.Machine
+        for rows.Next() </span><span class="cov0" title="0">{
+                var machine model.Machine
+                if err := rows.Scan(&amp;machine.UUID, &amp;machine.TypeID, &amp;machine.Location, &amp;machine.Status, &amp;machine.StorageDetails); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">machines = append(machines, machine)</span>
+        }
+
+        <span class="cov0" title="0">return machines, nil</span>
+}
+
+func (mr *MachineRepositoryImpl) UpdateMachine(ctx context.Context, machine *model.Machine) (int64, error) <span class="cov0" title="0">{
+        query := table.Machine.UPDATE().SET(
+                table.Machine.TypeID.SET(postgres.Int32(machine.TypeID)),
+                table.Machine.Location.SET(postgres.String(machine.Location)),
+                table.Machine.Status.SET(postgres.String(machine.Status)),
+                table.Machine.StorageDetails.SET(postgres.String(machine.StorageDetails)),
+        ).WHERE(
+                table.Machine.UUID.EQ(postgres.UUID(machine.UUID)),
+        )
+
+        queryString, args := query.Sql()
+        result, err := mr.db.ExecContext(ctx, queryString, args...)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+
+        <span class="cov0" title="0">return result.RowsAffected()</span>
+}
+
+func (mr *MachineRepositoryImpl) DeleteMachine(ctx context.Context, uuid uuid.UUID) (int64, error) <span class="cov0" title="0">{
+        query := table.Machine.DELETE().WHERE(
+                table.Machine.UUID.EQ(postgres.UUID(uuid)),
+        )
+
+        queryString, args := query.Sql()
+
+        result, err := mr.db.ExecContext(ctx, queryString, args...)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+
+        <span class="cov0" title="0">return result.RowsAffected()</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package repository
+
+import (
+        "database/sql"
+        "github.com/go-jet/jet/v2/postgres"
+        "github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/model"
+        "github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/table"
+        "golang.org/x/net/context"
+)
+
+// ProductRepositoryImpl is an implementation of ProductRepository interface.
+type ProductRepositoryImpl struct {
+        db *sql.DB
+}
+
+func NewProductRepository(db *sql.DB) *ProductRepositoryImpl <span class="cov0" title="0">{
+        return &amp;ProductRepositoryImpl{
+                db: db,
+        }
+}</span>
+
+func (pr *ProductRepositoryImpl) GetAllProduct(ctx context.Context) ([]model.Product, error) <span class="cov0" title="0">{
+        query := postgres.SELECT(
+                table.Product.AllColumns,
+        ).FROM(
+                table.Product,
+        )
+
+        queryString, args := query.Sql()
+
+        rows, err := pr.db.QueryContext(ctx, queryString, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">defer rows.Close()
+
+        var products []model.Product
+        for rows.Next() </span><span class="cov0" title="0">{
+                var p model.Product
+                if err := rows.Scan(
+                        &amp;p.ID,
+                        &amp;p.Name,
+                        &amp;p.Price,
+                        &amp;p.Details,
+                ); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">products = append(products, p)</span>
+        }
+        <span class="cov0" title="0">return products, nil</span>
+}
+
+func (pr *ProductRepositoryImpl) GetProductByID(ctx context.Context, id int32) (model.Product, error) <span class="cov0" title="0">{
+        query := postgres.SELECT(
+                table.Product.AllColumns,
+        ).FROM(
+                table.Product,
+        ).WHERE(
+                table.Product.ID.EQ(postgres.Int32(id)),
+        )
+
+        queryString, args := query.Sql()
+
+        row := pr.db.QueryRowContext(ctx, queryString, args...)
+
+        var p model.Product
+        if err := row.Scan(
+                &amp;p.ID,
+                &amp;p.Name,
+                &amp;p.Price,
+                &amp;p.Details,
+        ); err != nil </span><span class="cov0" title="0">{
+                return model.Product{}, err
+        }</span>
+
+        <span class="cov0" title="0">return p, nil</span>
+}
+
+func (pr *ProductRepositoryImpl) CreateProduct(ctx context.Context, product *model.Product) (int64, error) <span class="cov0" title="0">{
+        query := table.Product.INSERT(
+                table.Product.Name,
+                table.Product.Price,
+                table.Product.Details,
+        ).VALUES(
+                product.Name,
+                product.Price,
+                product.Details,
+        )
+
+        queryString, args := query.Sql()
+
+        result, err := pr.db.ExecContext(ctx, queryString, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return -1, err
+        }</span>
+
+        <span class="cov0" title="0">return result.LastInsertId()</span>
+}
+
+func (pr *ProductRepositoryImpl) UpdateProduct(ctx context.Context, product *model.Product) (int64, error) <span class="cov0" title="0">{
+        query := table.Product.UPDATE(
+                table.Product.Name,
+                table.Product.Price,
+                table.Product.Details,
+        ).SET(
+                table.Product.Name.SET(postgres.String(product.Name)),
+                table.Product.Price.SET(postgres.Float(product.Price)),
+                table.Product.Details.SET(postgres.String(product.Details)),
+        ).WHERE(
+                table.Product.ID.EQ(postgres.Int32(product.ID)),
+        )
+
+        queryString, args := query.Sql()
+
+        result, err := pr.db.ExecContext(ctx, queryString, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return -1, err
+        }</span>
+
+        <span class="cov0" title="0">return result.RowsAffected()</span>
+}
+
+func (pr *ProductRepositoryImpl) DeleteProduct(ctx context.Context, id int32) (int64, error) <span class="cov0" title="0">{
+        query := table.Product.DELETE().WHERE(
+                table.Product.ID.EQ(postgres.Int32(id)),
+        )
+
+        queryString, args := query.Sql()
+
+        result, err := pr.db.ExecContext(ctx, queryString, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return -1, err
+        }</span>
+
+        <span class="cov0" title="0">return result.RowsAffected()</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package repository
+
+import (
+        "context"
+        "database/sql"
+        "github.com/go-jet/jet/v2/postgres"
+        "github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/model"
+        "github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/table"
+)
+
+type UserLoginRepositoryImpl struct {
+        db *sql.DB
+}
+
+func NewUserLoginRepository(db *sql.DB) *UserLoginRepositoryImpl <span class="cov0" title="0">{
+        return &amp;UserLoginRepositoryImpl{
+                db: db,
+        }
+}</span>
+
+// InsertUserLogin inserts a new user login record into the database.
+func (ulr *UserLoginRepositoryImpl) InsertUserLogin(ctx context.Context, userLogin *model.UserLogin) (int64, error) <span class="cov0" title="0">{
+        query := table.UserLogin.INSERT(
+                table.UserLogin.Username,
+                table.UserLogin.Password,
+        ).VALUES(
+                userLogin.Username,
+                userLogin.Password,
+        ).RETURNING(
+                table.UserLogin.ID,
+        )
+
+        queryString, args := query.Sql()
+
+        result, err := ulr.db.ExecContext(ctx, queryString, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+
+        <span class="cov0" title="0">return result.RowsAffected()</span>
+}
+
+func (ulr *UserLoginRepositoryImpl) GetUserLoginByUsername(ctx context.Context, username string) (model.UserLogin, error) <span class="cov0" title="0">{
+        query := table.UserLogin.SELECT(
+                table.UserLogin.AllColumns,
+        ).WHERE(
+                table.UserLogin.Username.EQ(postgres.String(username)),
+        ).LIMIT(1)
+
+        queryString, args := query.Sql()
+        row := ulr.db.QueryRowContext(ctx, queryString, args...)
+
+        var userLogin model.UserLogin
+        if err := row.Scan(&amp;userLogin.ID, &amp;userLogin.Username, &amp;userLogin.Password); err != nil </span><span class="cov0" title="0">{
+                return model.UserLogin{}, err
+        }</span>
+        <span class="cov0" title="0">return userLogin, nil</span>
+}
+
+func (ulr *UserLoginRepositoryImpl) UpdateUserLogin(ctx context.Context, userLogin *model.UserLogin) (int64, error) <span class="cov0" title="0">{
+        query := table.UserLogin.UPDATE().SET(
+                table.UserLogin.Username.SET(postgres.String(userLogin.Username)),
+                table.UserLogin.Password.SET(postgres.String(userLogin.Password)),
+        ).WHERE(
+                table.UserLogin.ID.EQ(postgres.Int32(userLogin.ID)),
+        )
+
+        queryString, args := query.Sql()
+        result, err := ulr.db.ExecContext(ctx, queryString, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+        <span class="cov0" title="0">return result.RowsAffected()</span>
+}
+
+func (ulr *UserLoginRepositoryImpl) DeleteUserLogin(ctx context.Context, username string) (int64, error) <span class="cov0" title="0">{
+        query := table.UserLogin.DELETE().WHERE(
+                table.UserLogin.Username.EQ(postgres.String(username)),
+        )
+        queryString, args := query.Sql()
+        result, err := ulr.db.ExecContext(ctx, queryString, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+        <span class="cov0" title="0">return result.RowsAffected()</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package service
+
+import (
+        "github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/model"
+        "github.com/touutae-lab/vending-api/internal/repository"
+        "golang.org/x/net/context"
+)
+
+type MachineServiceImpl struct {
+        machineRepo repository.MachineRepository
+}
+
+func NewMachineService(repo repository.MachineRepository) *MachineServiceImpl <span class="cov8" title="1">{
+        return &amp;MachineServiceImpl{
+                machineRepo: repo,
+        }
+}</span>
+
+func (ms *MachineServiceImpl) GetMachineTypeByID(ctx context.Context, id int32) (model.Machinetype, error) <span class="cov8" title="1">{
+        result, err := ms.machineRepo.GetMachineTypeByID(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return model.Machinetype{}, err
+        }</span>
+        <span class="cov8" title="1">return result, nil</span>
+}
+
+func (ms *MachineServiceImpl) GetMachineByID(ctx context.Context, id int32) (model.Machine, error) <span class="cov8" title="1">{
+        result, err := ms.machineRepo.GetMachineByID(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return model.Machine{}, err
+        }</span>
+        <span class="cov8" title="1">return result, nil</span>
+}
+
+func (ms *MachineServiceImpl) GetAllMachine(ctx context.Context) ([]model.Machine, error) <span class="cov8" title="1">{
+        result, err := ms.machineRepo.GetAllMachine(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return result, nil</span>
+}
+
+func (ms *MachineServiceImpl) CreateMachine(ctx context.Context, machine model.Machine) (int64, error) <span class="cov8" title="1">{
+        return ms.machineRepo.CreateMachine(ctx, machine)
+}</span>
+
+func (ms *MachineServiceImpl) UpdateMachine(ctx context.Context, machine model.Machine) (int64, error) <span class="cov8" title="1">{
+        return ms.machineRepo.UpdateMachine(ctx, machine)
+}</span>
+
+func (ms *MachineServiceImpl) DeleteMachine(ctx context.Context, id int32) (int64, error) <span class="cov8" title="1">{
+        return ms.machineRepo.DeleteMachine(ctx, id)
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package service
+
+import (
+        "github.com/touutae-lab/vending-api/internal/dto"
+        "github.com/touutae-lab/vending-api/internal/repository"
+        "golang.org/x/net/context"
+)
+
+type ProductServiceImpl struct {
+        productRepo repository.ProductRepository
+}
+
+func NewProductService(repo repository.ProductRepository) *ProductServiceImpl <span class="cov8" title="1">{
+        return &amp;ProductServiceImpl{
+                productRepo: repo,
+        }
+}</span>
+
+func (ps *ProductServiceImpl) GetAllProduct(ctx context.Context) ([]dto.ProductDTO, error) <span class="cov8" title="1">{
+        products, err := ps.productRepo.GetAllProduct(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">var dtos []dto.ProductDTO
+        for _, p := range products </span><span class="cov8" title="1">{
+                dtos = append(dtos, dto.ToProductDTO(p))
+        }</span>
+        <span class="cov8" title="1">return dtos, nil</span>
+}
+
+func (ps *ProductServiceImpl) GetProductByID(ctx context.Context, id int32) (dto.ProductDTO, error) <span class="cov8" title="1">{
+        product, err := ps.productRepo.GetProductByID(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return dto.ProductDTO{}, err
+        }</span>
+
+        <span class="cov8" title="1">return dto.ToProductDTO(product), nil</span>
+}
+
+func (ps *ProductServiceImpl) CreateProduct(ctx context.Context, product dto.ProductDTO) (int64, error) <span class="cov8" title="1">{
+        return ps.productRepo.CreateProduct(ctx, product.ToDomain())
+}</span>
+
+func (ps *ProductServiceImpl) UpdateProduct(ctx context.Context, product dto.ProductDTO) (int64, error) <span class="cov8" title="1">{
+        return ps.productRepo.UpdateProduct(ctx, product.ToDomain())
+}</span>
+
+func (ps *ProductServiceImpl) DeleteProduct(ctx context.Context, id int32) (int64, error) <span class="cov8" title="1">{
+        return ps.productRepo.DeleteProduct(ctx, id)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

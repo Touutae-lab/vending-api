@@ -23,7 +23,7 @@ func main() {
 	db := persistence.NewPostgresConnectionPool()
 
 	var productRepository repository.ProductRepository = repository.NewProductRepository(db)
-	var productService *service.ProductService = service.NewProductService(productRepository)
+	var productService *service.ProductServiceImpl = service.NewProductService(productRepository)
 
 	var productController *handler.ProductHandler = handler.NewProductHandler(&context, productService)
 

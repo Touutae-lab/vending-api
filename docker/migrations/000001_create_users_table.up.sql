@@ -26,3 +26,10 @@ CREATE TABLE Machine (
                                          storage_details JSON NOT NULL,
                                          FOREIGN KEY (type_id) REFERENCES MachineType(id)
 );
+
+-- User Table
+CREATE TABLE USER_LOGIN (
+                                     id SERIAL PRIMARY KEY,
+                                     username VARCHAR(255) NOT NULL,
+                                     password VARCHAR(255) NOT NULL
+);

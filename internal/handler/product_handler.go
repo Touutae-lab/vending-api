@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/touutae-lab/vending-api/internal/dto"
+	"github.com/touutae-lab/vending-api/internal/lib"
 	"github.com/touutae-lab/vending-api/internal/service"
 	"golang.org/x/net/context"
 	"net/http"
@@ -13,10 +14,10 @@ import (
 
 type ProductHandler struct {
 	Context *context.Context
-	Service *service.ProductService
+	Service service.ProductService
 }
 
-func NewProductHandler(ctx *context.Context, productService *service.ProductService) *ProductHandler {
+func NewProductHandler(ctx *context.Context, productService service.ProductService) *ProductHandler {
 	return &ProductHandler{
 		Context: ctx,
 		Service: productService,
@@ -24,11 +25,15 @@ func NewProductHandler(ctx *context.Context, productService *service.ProductServ
 }
 
 func (h *ProductHandler) RegisterRoute(router *gin.Engine) {
-	router.GET("/product", h.GetAllProduct)
-	router.GET("/product/:id", h.GetProductByID)
-	router.POST("/product", h.CreateProduct)
-	router.PUT("/product", h.UpdateProduct)
-	router.DELETE("/product/:id", h.DeleteProduct)
+	api := router.Group("/product")
+	api.Use(lib.JWTAuthMiddleWare())
+	{
+		api.GET("/", h.GetAllProduct)
+		api.GET("/:id", h.GetProductByID)
+		api.POST("/", h.CreateProduct)
+		api.PUT("/", h.UpdateProduct)
+		api.DELETE("/:id", h.DeleteProduct)
+	}
 }
 
 func (h *ProductHandler) GetAllProduct(c *gin.Context) {
@@ -38,7 +43,6 @@ func (h *ProductHandler) GetAllProduct(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, products)
-
 }
 
 func (h *ProductHandler) GetProductByID(c *gin.Context) {
