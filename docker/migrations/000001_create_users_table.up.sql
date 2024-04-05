@@ -14,17 +14,16 @@ CREATE TABLE Product (
                                          id SERIAL PRIMARY KEY,
                                          name VARCHAR(255) NOT NULL,
                                          price DECIMAL(10, 2) NOT NULL,
-                                         details JSON NOT NULL
+                                         details TEXT NOT NULL
 );
 
 -- Machine Table
 CREATE TABLE Machine (
                                          uuid UUID PRIMARY KEY,
-                                         type_id INTEGER NOT NULL,
-                                         location JSON NOT NULL,
+                                         name VARCHAR(255) NOT NULL,
+                                         location TEXT NOT NULL,
                                          status VARCHAR(50) NOT NULL,
-                                         storage_details JSON NOT NULL,
-                                         FOREIGN KEY (type_id) REFERENCES MachineType(id)
+                                         storage_details JSON NOT NULL
 );
 
 -- User Table
@@ -32,4 +31,13 @@ CREATE TABLE USER_LOGIN (
                                      id SERIAL PRIMARY KEY,
                                      username VARCHAR(255) NOT NULL,
                                      password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Transaction (
+                                     id SERIAL PRIMARY KEY,
+                                     machine_id UUID NOT NULL,
+                                     product_id INT NOT NULL,
+                                     quantity INT NOT NULL,
+                                     total_price DECIMAL(10, 2) NOT NULL,
+                                     order_date TIMESTAMP NOT NULL
 );

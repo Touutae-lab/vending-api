@@ -12,6 +12,7 @@ package mocks
 import (
 	reflect "reflect"
 
+	uuid "github.com/google/uuid"
 	model "github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/model"
 	gomock "go.uber.org/mock/gomock"
 	context "golang.org/x/net/context"
@@ -41,10 +42,10 @@ func (m *MockMachineService) EXPECT() *MockMachineServiceMockRecorder {
 }
 
 // CreateMachine mocks base method.
-func (m *MockMachineService) CreateMachine(ctx context.Context, machine model.Machine) (int64, error) {
+func (m *MockMachineService) CreateMachine(ctx context.Context, machine model.Machine) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateMachine", ctx, machine)
-	ret0, _ := ret[0].(int64)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -56,10 +57,10 @@ func (mr *MockMachineServiceMockRecorder) CreateMachine(ctx, machine any) *gomoc
 }
 
 // DeleteMachine mocks base method.
-func (m *MockMachineService) DeleteMachine(ctx context.Context, id int32) (int64, error) {
+func (m *MockMachineService) DeleteMachine(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMachine", ctx, id)
-	ret0, _ := ret[0].(int64)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -86,7 +87,7 @@ func (mr *MockMachineServiceMockRecorder) GetAllMachine(ctx any) *gomock.Call {
 }
 
 // GetMachineByID mocks base method.
-func (m *MockMachineService) GetMachineByID(ctx context.Context, id int32) (model.Machine, error) {
+func (m *MockMachineService) GetMachineByID(ctx context.Context, id uuid.UUID) (model.Machine, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMachineByID", ctx, id)
 	ret0, _ := ret[0].(model.Machine)
@@ -116,10 +117,10 @@ func (mr *MockMachineServiceMockRecorder) GetMachineTypeByID(ctx, id any) *gomoc
 }
 
 // UpdateMachine mocks base method.
-func (m *MockMachineService) UpdateMachine(ctx context.Context, machine model.Machine) (int64, error) {
+func (m *MockMachineService) UpdateMachine(ctx context.Context, machine model.Machine) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateMachine", ctx, machine)
-	ret0, _ := ret[0].(int64)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

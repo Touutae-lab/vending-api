@@ -12,6 +12,7 @@ package mocks
 import (
 	reflect "reflect"
 
+	uuid "github.com/google/uuid"
 	model "github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/model"
 	gomock "go.uber.org/mock/gomock"
 	context "golang.org/x/net/context"
@@ -56,7 +57,7 @@ func (mr *MockMachineHandlerInterfaceMockRecorder) CreateMachine(ctx, machine an
 }
 
 // DeleteMachine mocks base method.
-func (m *MockMachineHandlerInterface) DeleteMachine(ctx context.Context, id int32) (int64, error) {
+func (m *MockMachineHandlerInterface) DeleteMachine(ctx context.Context, id uuid.UUID) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMachine", ctx, id)
 	ret0, _ := ret[0].(int64)
@@ -86,7 +87,7 @@ func (mr *MockMachineHandlerInterfaceMockRecorder) GetAllMachine(ctx any) *gomoc
 }
 
 // GetMachineByID mocks base method.
-func (m *MockMachineHandlerInterface) GetMachineByID(ctx context.Context, id int32) (model.Machine, error) {
+func (m *MockMachineHandlerInterface) GetMachineByID(ctx context.Context, id uuid.UUID) (model.Machine, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMachineByID", ctx, id)
 	ret0, _ := ret[0].(model.Machine)

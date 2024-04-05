@@ -23,10 +23,15 @@ func main() {
 	db := persistence.NewPostgresConnectionPool()
 
 	var productRepository repository.ProductRepository = repository.NewProductRepository(db)
-	var productService *service.ProductServiceImpl = service.NewProductService(productRepository)
+	var productService service.ProductService = service.NewProductService(productRepository)
+
+	var machineRepository repository.MachineRepository = repository.NewMachineRepository(db)
+	var machineService *service.MachineServiceImpl = service.NewMachineService(machineRepository)
 
 	var productController *handler.ProductHandler = handler.NewProductHandler(&context, productService)
+	var machineController *handler.MachineHandler = handler.NewMachineHandler(&context, machineService)
 
+	machineController.RegisterRoute(router)
 	productController.RegisterRoute(router)
 	router.Run(":8080")
 

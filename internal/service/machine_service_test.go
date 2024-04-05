@@ -1,6 +1,7 @@
 package service_test
 
 import (
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/model"
 	"github.com/touutae-lab/vending-api/internal/service"
@@ -41,17 +42,27 @@ func TestMachineService_GetMachineByID(t *testing.T) {
 	mockRepo := mock_repository.NewMockMachineRepository(ctrl)
 
 	// Set expectation
-	mockRepo.EXPECT().GetMachineByID(gomock.Any(), int32(1)).Return(model.Machine{}, nil)
+	expect := uuid.New()
+
+	mapMachine := make(map[uuid.UUID]model.Machine)
+	mapMachine[expect] = model.Machine{
+		UUID:           expect,
+		Name:           "test",
+		Location:       "test",
+		Status:         "test",
+		StorageDetails: "test",
+	}
+	mockRepo.EXPECT().GetMachineByID(gomock.Any(), expect).Return(mapMachine[expect], nil)
 
 	// Create service with mock
 	machineService := service.NewMachineService(mockRepo)
 
 	// Call the method under test
-	result, err := machineService.GetMachineByID(context.Background(), 1)
+	result, err := machineService.GetMachineByID(context.Background(), expect)
 
 	// Assertions
 	assert.NoError(t, err)
-	assert.Equal(t, model.Machine{}, result)
+	assert.Equal(t, mapMachine[expect], result)
 }
 
 func TestMachineService_CreateMachine(t *testing.T) {
@@ -63,7 +74,7 @@ func TestMachineService_CreateMachine(t *testing.T) {
 	mockRepo := mock_repository.NewMockMachineRepository(ctrl)
 
 	// Set expectation
-	mockRepo.EXPECT().CreateMachine(gomock.Any(), gomock.Any()).Return(int64(1), nil)
+	mockRepo.EXPECT().CreateMachine(gomock.Any(), gomock.Any()).Return(uuid.New(), nil)
 
 	// Create service with mock
 	machineService := service.NewMachineService(mockRepo)
@@ -73,7 +84,7 @@ func TestMachineService_CreateMachine(t *testing.T) {
 
 	// Assertions
 	assert.NoError(t, err)
-	assert.Equal(t, int64(1), result)
+	assert.NotEqual(t, uuid.Nil, result)
 }
 
 func TestMachineService_UpdateMachine(t *testing.T) {
@@ -85,7 +96,7 @@ func TestMachineService_UpdateMachine(t *testing.T) {
 	mockRepo := mock_repository.NewMockMachineRepository(ctrl)
 
 	// Set expectation
-	mockRepo.EXPECT().UpdateMachine(gomock.Any(), gomock.Any()).Return(int64(1), nil)
+	mockRepo.EXPECT().UpdateMachine(gomock.Any(), gomock.Any()).Return(uuid.New(), nil)
 
 	// Create service with mock
 	machineService := service.NewMachineService(mockRepo)
@@ -95,29 +106,7 @@ func TestMachineService_UpdateMachine(t *testing.T) {
 
 	// Assertions
 	assert.NoError(t, err)
-	assert.Equal(t, int64(1), result)
-}
-
-func TestMachineService_GetMachineTypeByID(t *testing.T) {
-	// Setup mock controller
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	// Create mock repository
-	mockRepo := mock_repository.NewMockMachineRepository(ctrl)
-
-	// Set expectation
-	mockRepo.EXPECT().GetMachineTypeByID(gomock.Any(), int32(1)).Return(model.Machinetype{}, nil)
-
-	// Create service with mock
-	machineService := service.NewMachineService(mockRepo)
-
-	// Call the method under test
-	result, err := machineService.GetMachineTypeByID(context.Background(), 1)
-
-	// Assertions
-	assert.NoError(t, err)
-	assert.Equal(t, model.Machinetype{}, result)
+	assert.NotEqual(t, uuid.Nil, result)
 }
 
 func TestMachineService_DeleteMachine(t *testing.T) {
@@ -129,15 +118,15 @@ func TestMachineService_DeleteMachine(t *testing.T) {
 	mockRepo := mock_repository.NewMockMachineRepository(ctrl)
 
 	// Set expectation
-	mockRepo.EXPECT().DeleteMachine(gomock.Any(), gomock.Any()).Return(int64(1), nil)
+	mockRepo.EXPECT().DeleteMachine(gomock.Any(), gomock.Any()).Return(uuid.New(), nil)
 
 	// Create service with mock
 	machineService := service.NewMachineService(mockRepo)
 
 	// Call the method under test
-	result, err := machineService.DeleteMachine(context.Background(), int32(1))
+	result, err := machineService.DeleteMachine(context.Background(), uuid.New())
 
 	// Assertions
 	assert.NoError(t, err)
-	assert.Equal(t, int64(1), result)
+	assert.NotEqual(t, uuid.Nil, result)
 }

@@ -9,12 +9,14 @@ package model
 
 import (
 	"github.com/google/uuid"
+	"time"
 )
 
-type Machine struct {
-	UUID           uuid.UUID `sql:"primary_key"`
-	Name           string
-	Location       string
-	Status         string
-	StorageDetails string
+type Transaction struct {
+	ID         int32 `sql:"primary_key"`
+	MachineID  uuid.UUID
+	ProductID  int32
+	Quantity   int32
+	TotalPrice float64
+	OrderDate  time.Time
 }

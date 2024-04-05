@@ -19,35 +19,7 @@ func NewMachineRepository(db *sql.DB) *MachineRepositoryImpl {
 	}
 }
 
-func (mr *MachineRepositoryImpl) InsertMachine(ctx context.Context, machine *model.Machine) (int64, error) {
-	query := table.Machine.INSERT(
-		table.Machine.UUID,
-		table.Machine.TypeID,
-		table.Machine.Location,
-		table.Machine.Status,
-		table.Machine.StorageDetails,
-	).VALUES(
-		machine.UUID,
-		machine.TypeID,
-		machine.Location,
-		machine.Status,
-		machine.StorageDetails,
-	).RETURNING(
-		table.Machine.UUID,
-	)
-
-	queryString, args := query.Sql()
-
-	result, err := mr.db.ExecContext(ctx, queryString, args...)
-
-	if err != nil {
-		return 0, err
-	}
-
-	return result.RowsAffected()
-}
-
-func (mr *MachineRepositoryImpl) GetMachineByUUID(ctx context.Context, uuid uuid.UUID) (model.Machine, error) {
+func (mr *MachineRepositoryImpl) GetMachineByID(ctx context.Context, uuid uuid.UUID) (model.Machine, error) {
 	query := table.Machine.SELECT(
 		table.Machine.AllColumns,
 	).WHERE(
@@ -58,7 +30,7 @@ func (mr *MachineRepositoryImpl) GetMachineByUUID(ctx context.Context, uuid uuid
 	row := mr.db.QueryRowContext(ctx, queryString, args...)
 
 	var machine model.Machine
-	if err := row.Scan(&machine.UUID, &machine.TypeID, &machine.Location, &machine.Status, &machine.StorageDetails); err != nil {
+	if err := row.Scan(&machine.UUID, &machine.Name, &machine.Location, &machine.Status, &machine.StorageDetails); err != nil {
 		return model.Machine{}, err
 	}
 
@@ -82,7 +54,7 @@ func (mr *MachineRepositoryImpl) GetAllMachine(ctx context.Context) ([]model.Mac
 	var machines []model.Machine
 	for rows.Next() {
 		var machine model.Machine
-		if err := rows.Scan(&machine.UUID, &machine.TypeID, &machine.Location, &machine.Status, &machine.StorageDetails); err != nil {
+		if err := rows.Scan(&machine.UUID, &machine.Name, &machine.Location, &machine.Status, &machine.StorageDetails); err != nil {
 			return nil, err
 		}
 		machines = append(machines, machine)
@@ -91,38 +63,70 @@ func (mr *MachineRepositoryImpl) GetAllMachine(ctx context.Context) ([]model.Mac
 	return machines, nil
 }
 
-func (mr *MachineRepositoryImpl) UpdateMachine(ctx context.Context, machine *model.Machine) (int64, error) {
+func (mr *MachineRepositoryImpl) CreateMachine(ctx context.Context, machine model.Machine) (uuid.UUID, error) {
+	var createdUUID uuid.UUID
+	query := table.Machine.INSERT(
+		table.Machine.UUID,
+		table.Machine.Name,
+		table.Machine.Location,
+		table.Machine.Status,
+		table.Machine.StorageDetails,
+	).VALUES(
+		machine.UUID,
+		machine.Name,
+		machine.Location,
+		machine.Status,
+		machine.StorageDetails,
+	).RETURNING(
+		table.Machine.UUID,
+	)
+
+	queryString, args := query.Sql()
+
+	err := mr.db.QueryRowContext(ctx, queryString, args...).Scan(&createdUUID)
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+
+	return createdUUID, nil
+}
+
+func (mr *MachineRepositoryImpl) UpdateMachine(ctx context.Context, machine model.Machine) (uuid.UUID, error) {
+	var updatedUUID uuid.UUID
 	query := table.Machine.UPDATE().SET(
-		table.Machine.TypeID.SET(postgres.Int32(machine.TypeID)),
 		table.Machine.Location.SET(postgres.String(machine.Location)),
+		table.Machine.Name.SET(postgres.String(machine.Name)),
 		table.Machine.Status.SET(postgres.String(machine.Status)),
 		table.Machine.StorageDetails.SET(postgres.String(machine.StorageDetails)),
 	).WHERE(
 		table.Machine.UUID.EQ(postgres.UUID(machine.UUID)),
+	).RETURNING(
+		table.Machine.UUID,
 	)
 
 	queryString, args := query.Sql()
-	result, err := mr.db.ExecContext(ctx, queryString, args...)
-
+	err := mr.db.QueryRowContext(ctx, queryString, args...).Scan(&updatedUUID)
 	if err != nil {
-		return 0, err
+		return uuid.UUID{}, err
 	}
 
-	return result.RowsAffected()
+	return updatedUUID, nil
 }
 
-func (mr *MachineRepositoryImpl) DeleteMachine(ctx context.Context, uuid uuid.UUID) (int64, error) {
+func (mr *MachineRepositoryImpl) DeleteMachine(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+	var deletedUUID uuid.UUID
 	query := table.Machine.DELETE().WHERE(
-		table.Machine.UUID.EQ(postgres.UUID(uuid)),
+		table.Machine.UUID.EQ(postgres.UUID(id)),
+	).RETURNING(
+		table.Machine.UUID,
 	)
 
 	queryString, args := query.Sql()
 
-	result, err := mr.db.ExecContext(ctx, queryString, args...)
-
+	err := mr.db.QueryRowContext(ctx, queryString, args...).Scan(&deletedUUID)
 	if err != nil {
-		return 0, err
+		return uuid.UUID{}, err
 	}
 
-	return result.RowsAffected()
+	return deletedUUID, nil
 }

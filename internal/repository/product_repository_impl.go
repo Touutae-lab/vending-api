@@ -8,7 +8,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-// ProductRepositoryImpl is an implementation of ProductRepository interface.
 type ProductRepositoryImpl struct {
 	db *sql.DB
 }

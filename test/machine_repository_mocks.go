@@ -12,6 +12,7 @@ package mocks
 import (
 	reflect "reflect"
 
+	uuid "github.com/google/uuid"
 	model "github.com/touutae-lab/vending-api/internal/database/vending_machine/vending_machine_service/model"
 	gomock "go.uber.org/mock/gomock"
 	context "golang.org/x/net/context"
@@ -41,10 +42,10 @@ func (m *MockMachineRepository) EXPECT() *MockMachineRepositoryMockRecorder {
 }
 
 // CreateMachine mocks base method.
-func (m *MockMachineRepository) CreateMachine(ctx context.Context, machine model.Machine) (int64, error) {
+func (m *MockMachineRepository) CreateMachine(ctx context.Context, machine model.Machine) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateMachine", ctx, machine)
-	ret0, _ := ret[0].(int64)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -56,10 +57,10 @@ func (mr *MockMachineRepositoryMockRecorder) CreateMachine(ctx, machine any) *go
 }
 
 // DeleteMachine mocks base method.
-func (m *MockMachineRepository) DeleteMachine(ctx context.Context, id int32) (int64, error) {
+func (m *MockMachineRepository) DeleteMachine(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMachine", ctx, id)
-	ret0, _ := ret[0].(int64)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -86,7 +87,7 @@ func (mr *MockMachineRepositoryMockRecorder) GetAllMachine(ctx any) *gomock.Call
 }
 
 // GetMachineByID mocks base method.
-func (m *MockMachineRepository) GetMachineByID(ctx context.Context, id int32) (model.Machine, error) {
+func (m *MockMachineRepository) GetMachineByID(ctx context.Context, id uuid.UUID) (model.Machine, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMachineByID", ctx, id)
 	ret0, _ := ret[0].(model.Machine)
@@ -100,26 +101,11 @@ func (mr *MockMachineRepositoryMockRecorder) GetMachineByID(ctx, id any) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMachineByID", reflect.TypeOf((*MockMachineRepository)(nil).GetMachineByID), ctx, id)
 }
 
-// GetMachineTypeByID mocks base method.
-func (m *MockMachineRepository) GetMachineTypeByID(ctx context.Context, id int32) (model.Machinetype, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMachineTypeByID", ctx, id)
-	ret0, _ := ret[0].(model.Machinetype)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetMachineTypeByID indicates an expected call of GetMachineTypeByID.
-func (mr *MockMachineRepositoryMockRecorder) GetMachineTypeByID(ctx, id any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMachineTypeByID", reflect.TypeOf((*MockMachineRepository)(nil).GetMachineTypeByID), ctx, id)
-}
-
 // UpdateMachine mocks base method.
-func (m *MockMachineRepository) UpdateMachine(ctx context.Context, machine model.Machine) (int64, error) {
+func (m *MockMachineRepository) UpdateMachine(ctx context.Context, machine model.Machine) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateMachine", ctx, machine)
-	ret0, _ := ret[0].(int64)
+	ret0, _ := ret[0].(uuid.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

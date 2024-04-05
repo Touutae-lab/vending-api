@@ -18,7 +18,7 @@ type machineTable struct {
 
 	// Columns
 	UUID           postgres.ColumnString
-	TypeID         postgres.ColumnInteger
+	Name           postgres.ColumnString
 	Location       postgres.ColumnString
 	Status         postgres.ColumnString
 	StorageDetails postgres.ColumnString
@@ -63,12 +63,12 @@ func newMachineTable(schemaName, tableName, alias string) *MachineTable {
 func newMachineTableImpl(schemaName, tableName, alias string) machineTable {
 	var (
 		UUIDColumn           = postgres.StringColumn("uuid")
-		TypeIDColumn         = postgres.IntegerColumn("type_id")
+		NameColumn           = postgres.StringColumn("name")
 		LocationColumn       = postgres.StringColumn("location")
 		StatusColumn         = postgres.StringColumn("status")
 		StorageDetailsColumn = postgres.StringColumn("storage_details")
-		allColumns           = postgres.ColumnList{UUIDColumn, TypeIDColumn, LocationColumn, StatusColumn, StorageDetailsColumn}
-		mutableColumns       = postgres.ColumnList{TypeIDColumn, LocationColumn, StatusColumn, StorageDetailsColumn}
+		allColumns           = postgres.ColumnList{UUIDColumn, NameColumn, LocationColumn, StatusColumn, StorageDetailsColumn}
+		mutableColumns       = postgres.ColumnList{NameColumn, LocationColumn, StatusColumn, StorageDetailsColumn}
 	)
 
 	return machineTable{
@@ -76,7 +76,7 @@ func newMachineTableImpl(schemaName, tableName, alias string) machineTable {
 
 		//Columns
 		UUID:           UUIDColumn,
-		TypeID:         TypeIDColumn,
+		Name:           NameColumn,
 		Location:       LocationColumn,
 		Status:         StatusColumn,
 		StorageDetails: StorageDetailsColumn,
