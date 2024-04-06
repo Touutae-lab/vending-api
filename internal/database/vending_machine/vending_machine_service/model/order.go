@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-type Transaction struct {
+type Order struct {
 	ID         int32 `sql:"primary_key"`
 	MachineID  uuid.UUID
 	ProductID  int32

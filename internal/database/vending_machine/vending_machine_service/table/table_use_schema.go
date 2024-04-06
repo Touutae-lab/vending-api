@@ -12,7 +12,7 @@ package table
 func UseSchema(schema string) {
 	Machine = Machine.FromSchema(schema)
 	Machinetype = Machinetype.FromSchema(schema)
+	Order = Order.FromSchema(schema)
 	Product = Product.FromSchema(schema)
-	Transaction = Transaction.FromSchema(schema)
 	UserLogin = UserLogin.FromSchema(schema)
 }

@@ -33,7 +33,7 @@ CREATE TABLE USER_LOGIN (
                                      password VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE Transaction (
+CREATE TABLE "order" (
                                      id SERIAL PRIMARY KEY,
                                      machine_id UUID NOT NULL,
                                      product_id INT NOT NULL,
@@ -41,3 +41,13 @@ CREATE TABLE Transaction (
                                      total_price DECIMAL(10, 2) NOT NULL,
                                      order_date TIMESTAMP NOT NULL
 );
+
+CREATE TABLE "order_status" (
+                                     id SERIAL PRIMARY KEY,
+                                     order_id INT NOT NULL,
+                                     status VARCHAR(50) NOT NULL
+);
+
+ALTER TABLE "order" ADD FOREIGN KEY (machine_id) REFERENCES Machine(uuid);
+ALTER TABLE "order" ADD FOREIGN KEY (product_id) REFERENCES Product(id);
+ALTER TABLE "order_status" ADD FOREIGN KEY (order_id) REFERENCES "order"(id);

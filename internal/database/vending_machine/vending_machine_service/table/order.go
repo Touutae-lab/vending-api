@@ -11,9 +11,9 @@ import (
 	"github.com/go-jet/jet/v2/postgres"
 )
 
-var Transaction = newTransactionTable("vending_machine_service", "transaction", "")
+var Order = newOrderTable("vending_machine_service", "order", "")
 
-type transactionTable struct {
+type orderTable struct {
 	postgres.Table
 
 	// Columns
@@ -28,40 +28,40 @@ type transactionTable struct {
 	MutableColumns postgres.ColumnList
 }
 
-type TransactionTable struct {
-	transactionTable
+type OrderTable struct {
+	orderTable
 
-	EXCLUDED transactionTable
+	EXCLUDED orderTable
 }
 
-// AS creates new TransactionTable with assigned alias
-func (a TransactionTable) AS(alias string) *TransactionTable {
-	return newTransactionTable(a.SchemaName(), a.TableName(), alias)
+// AS creates new OrderTable with assigned alias
+func (a OrderTable) AS(alias string) *OrderTable {
+	return newOrderTable(a.SchemaName(), a.TableName(), alias)
 }
 
-// Schema creates new TransactionTable with assigned schema name
-func (a TransactionTable) FromSchema(schemaName string) *TransactionTable {
-	return newTransactionTable(schemaName, a.TableName(), a.Alias())
+// Schema creates new OrderTable with assigned schema name
+func (a OrderTable) FromSchema(schemaName string) *OrderTable {
+	return newOrderTable(schemaName, a.TableName(), a.Alias())
 }
 
-// WithPrefix creates new TransactionTable with assigned table prefix
-func (a TransactionTable) WithPrefix(prefix string) *TransactionTable {
-	return newTransactionTable(a.SchemaName(), prefix+a.TableName(), a.TableName())
+// WithPrefix creates new OrderTable with assigned table prefix
+func (a OrderTable) WithPrefix(prefix string) *OrderTable {
+	return newOrderTable(a.SchemaName(), prefix+a.TableName(), a.TableName())
 }
 
-// WithSuffix creates new TransactionTable with assigned table suffix
-func (a TransactionTable) WithSuffix(suffix string) *TransactionTable {
-	return newTransactionTable(a.SchemaName(), a.TableName()+suffix, a.TableName())
+// WithSuffix creates new OrderTable with assigned table suffix
+func (a OrderTable) WithSuffix(suffix string) *OrderTable {
+	return newOrderTable(a.SchemaName(), a.TableName()+suffix, a.TableName())
 }
 
-func newTransactionTable(schemaName, tableName, alias string) *TransactionTable {
-	return &TransactionTable{
-		transactionTable: newTransactionTableImpl(schemaName, tableName, alias),
-		EXCLUDED:         newTransactionTableImpl("", "excluded", ""),
+func newOrderTable(schemaName, tableName, alias string) *OrderTable {
+	return &OrderTable{
+		orderTable: newOrderTableImpl(schemaName, tableName, alias),
+		EXCLUDED:   newOrderTableImpl("", "excluded", ""),
 	}
 }
 
-func newTransactionTableImpl(schemaName, tableName, alias string) transactionTable {
+func newOrderTableImpl(schemaName, tableName, alias string) orderTable {
 	var (
 		IDColumn         = postgres.IntegerColumn("id")
 		MachineIDColumn  = postgres.StringColumn("machine_id")
@@ -73,7 +73,7 @@ func newTransactionTableImpl(schemaName, tableName, alias string) transactionTab
 		mutableColumns   = postgres.ColumnList{MachineIDColumn, ProductIDColumn, QuantityColumn, TotalPriceColumn, OrderDateColumn}
 	)
 
-	return transactionTable{
+	return orderTable{
 		Table: postgres.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns

@@ -37,11 +37,13 @@ func (h *MachineHandler) RegisterRoute(router *gin.Engine) {
 
 func (h *MachineHandler) MachineLogin(c *gin.Context) {
 	var request dto.MachineLoginRequest
+
 	if err := c.BindJSON(&request); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid request"})
 		return
 	}
-	_, err := h.Service.GetMachineByID(*h.Context, request.ID)
+
+	machine, err := h.Service.GetMachineByID(*h.Context, request.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			c.JSON(404, gin.H{"error": "Machine not found"})
@@ -51,7 +53,7 @@ func (h *MachineHandler) MachineLogin(c *gin.Context) {
 		return
 	}
 
-	token, err := lib.GenerateMachineJWT(request.ID)
+	token, err := lib.GenerateMachineJWT(machine.UUID)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "There is somethings wrong when generate token"})
 		return
