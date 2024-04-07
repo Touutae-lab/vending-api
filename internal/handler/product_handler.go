@@ -25,7 +25,7 @@ func NewProductHandler(ctx *context.Context, productService service.ProductServi
 }
 
 func (h *ProductHandler) RegisterRoute(router *gin.Engine) {
-	api := router.Group("/product")
+	api := router.Group("product")
 	api.Use(lib.JWTAuthMiddleWare())
 	{
 		api.GET("/", h.GetAllProduct)

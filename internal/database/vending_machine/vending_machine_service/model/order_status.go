@@ -7,10 +7,8 @@
 
 package model
 
-type Product struct {
+type OrderStatus struct {
 	ID      int32 `sql:"primary_key"`
-	Name    string
-	Price   float64
-	ImgURL  string
-	Details string
+	OrderID int32
+	Status  string
 }

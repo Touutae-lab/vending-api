@@ -20,6 +20,7 @@ type productTable struct {
 	ID      postgres.ColumnInteger
 	Name    postgres.ColumnString
 	Price   postgres.ColumnFloat
+	ImgURL  postgres.ColumnString
 	Details postgres.ColumnString
 
 	AllColumns     postgres.ColumnList
@@ -64,9 +65,10 @@ func newProductTableImpl(schemaName, tableName, alias string) productTable {
 		IDColumn       = postgres.IntegerColumn("id")
 		NameColumn     = postgres.StringColumn("name")
 		PriceColumn    = postgres.FloatColumn("price")
+		ImgURLColumn   = postgres.StringColumn("img_url")
 		DetailsColumn  = postgres.StringColumn("details")
-		allColumns     = postgres.ColumnList{IDColumn, NameColumn, PriceColumn, DetailsColumn}
-		mutableColumns = postgres.ColumnList{NameColumn, PriceColumn, DetailsColumn}
+		allColumns     = postgres.ColumnList{IDColumn, NameColumn, PriceColumn, ImgURLColumn, DetailsColumn}
+		mutableColumns = postgres.ColumnList{NameColumn, PriceColumn, ImgURLColumn, DetailsColumn}
 	)
 
 	return productTable{
@@ -76,6 +78,7 @@ func newProductTableImpl(schemaName, tableName, alias string) productTable {
 		ID:      IDColumn,
 		Name:    NameColumn,
 		Price:   PriceColumn,
+		ImgURL:  ImgURLColumn,
 		Details: DetailsColumn,
 
 		AllColumns:     allColumns,

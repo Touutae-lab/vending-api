@@ -13,6 +13,7 @@ func UseSchema(schema string) {
 	Machine = Machine.FromSchema(schema)
 	Machinetype = Machinetype.FromSchema(schema)
 	Order = Order.FromSchema(schema)
+	OrderStatus = OrderStatus.FromSchema(schema)
 	Product = Product.FromSchema(schema)
 	UserLogin = UserLogin.FromSchema(schema)
 }

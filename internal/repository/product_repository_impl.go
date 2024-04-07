@@ -40,6 +40,7 @@ func (pr *ProductRepositoryImpl) GetAllProduct(ctx context.Context) ([]model.Pro
 			&p.ID,
 			&p.Name,
 			&p.Price,
+			&p.ImgURL,
 			&p.Details,
 		); err != nil {
 			return nil, err
@@ -67,6 +68,7 @@ func (pr *ProductRepositoryImpl) GetProductByID(ctx context.Context, id int32) (
 		&p.ID,
 		&p.Name,
 		&p.Price,
+		&p.ImgURL,
 		&p.Details,
 	); err != nil {
 		return model.Product{}, err
@@ -79,10 +81,12 @@ func (pr *ProductRepositoryImpl) CreateProduct(ctx context.Context, product *mod
 	query := table.Product.INSERT(
 		table.Product.Name,
 		table.Product.Price,
+		table.Product.ImgURL,
 		table.Product.Details,
 	).VALUES(
 		product.Name,
 		product.Price,
+		product.ImgURL,
 		product.Details,
 	)
 
@@ -100,10 +104,12 @@ func (pr *ProductRepositoryImpl) UpdateProduct(ctx context.Context, product *mod
 	query := table.Product.UPDATE(
 		table.Product.Name,
 		table.Product.Price,
+		table.Product.ImgURL,
 		table.Product.Details,
 	).SET(
 		table.Product.Name.SET(postgres.String(product.Name)),
 		table.Product.Price.SET(postgres.Float(product.Price)),
+		table.Product.ImgURL.SET(postgres.String(product.ImgURL)),
 		table.Product.Details.SET(postgres.String(product.Details)),
 	).WHERE(
 		table.Product.ID.EQ(postgres.Int32(product.ID)),

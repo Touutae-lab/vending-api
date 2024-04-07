@@ -7,12 +7,14 @@ type ProductDTO struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Price       float64 `json:"price"`
+	ImgURL      string  `json:"img_url"`
 }
 
 func ToProductDTO(product model.Product) ProductDTO {
 	return ProductDTO{
 		ID:          product.ID,
 		Name:        product.Name,
+		ImgURL:      product.ImgURL,
 		Description: product.Details,
 		Price:       product.Price,
 	}
