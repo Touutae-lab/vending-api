@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/touutae-lab/vending-api/internal/dto"
 	"github.com/touutae-lab/vending-api/internal/lib"
@@ -12,6 +13,7 @@ import (
 type RetailHandler struct {
 	Context *context.Context
 	Service service.RetailService
+	service.ProductService
 }
 
 func NewRetailHandler(ctx *context.Context, retailService service.RetailService) *RetailHandler {
@@ -24,6 +26,9 @@ func NewRetailHandler(ctx *context.Context, retailService service.RetailService)
 func (h *RetailHandler) RegisterRoute(router *gin.Engine) {
 	api := router.Group("/retail")
 	api.Use(lib.JWTAuthMiddleWare())
+	{
+		api.POST("/buy", h.BuyItem)
+	}
 }
 
 func (h *RetailHandler) BuyItem(c *gin.Context) {
@@ -33,17 +38,11 @@ func (h *RetailHandler) BuyItem(c *gin.Context) {
 		return
 	}
 
-	id, err := request.GetUUID()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid machine id"})
-		return
-	}
-
-	_, err = h.Service.BuyProduct(*h.Context, id, request.ProductID, request.Quantity)
+	_, err := h.Service.BuyProduct(*h.Context, request.MachineID, request.ProductID, request.Quantity, request.Amount)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully buy item"})
+	// This should have validation step, but since this for example project, so I will skip it
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Successfully buy item get your exchange back in the tray for $%d", request.Payment-request.Amount*request.Quantity)})
 }

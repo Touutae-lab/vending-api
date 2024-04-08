@@ -22,9 +22,9 @@ func NewRetailService(productRepo repository.ProductRepository, machineRepo repo
 	}
 }
 
-func (rs *RetailServiceImpl) BuyProduct(ctx context.Context, machineID uuid.UUID, productID int32, quantity int) (int32, error) {
+func (rs *RetailServiceImpl) BuyProduct(ctx context.Context, machineID uuid.UUID, productID int32, quantity int, totalPrice int) (int32, error) {
 
-	orderId, err := rs.orderRepo.CreateOrder(machineID, productID, quantity)
+	orderId, err := rs.orderRepo.CreateOrder(machineID, productID, quantity, totalPrice)
 
 	if err != nil {
 		return orderId, err
@@ -38,7 +38,7 @@ func (rs *RetailServiceImpl) BuyProduct(ctx context.Context, machineID uuid.UUID
 
 	var storage []dto.Storage
 
-	err = json.Unmarshal([]byte(machine.StorageDetails), storage)
+	err = json.Unmarshal([]byte(machine.StorageDetails), &storage)
 
 	if err != nil {
 		return orderId, err

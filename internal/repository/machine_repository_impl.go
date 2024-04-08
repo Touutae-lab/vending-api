@@ -97,7 +97,7 @@ func (mr *MachineRepositoryImpl) UpdateMachine(ctx context.Context, machine mode
 		table.Machine.Location.SET(postgres.String(machine.Location)),
 		table.Machine.Name.SET(postgres.String(machine.Name)),
 		table.Machine.Status.SET(postgres.String(machine.Status)),
-		table.Machine.StorageDetails.SET(postgres.String(machine.StorageDetails)),
+		table.Machine.StorageDetails.SET(postgres.Json(machine.StorageDetails)),
 	).WHERE(
 		table.Machine.UUID.EQ(postgres.UUID(machine.UUID)),
 	).RETURNING(

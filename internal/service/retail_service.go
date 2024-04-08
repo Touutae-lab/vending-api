@@ -6,5 +6,5 @@ import (
 )
 
 type RetailService interface {
-	BuyProduct(ctx context.Context, machineID uuid.UUID, productID int32, quantity int) (uuid.UUID, error)
+	BuyProduct(ctx context.Context, machineID uuid.UUID, productID int32, quantity int, totalPrice int) (int32, error)
 }
