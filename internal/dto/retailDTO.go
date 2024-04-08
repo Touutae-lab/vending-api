@@ -6,6 +6,7 @@ type BuyItemRequest struct {
 	MachineID string `json:"machine_id"`
 	ProductID int32  `json:"product_id"`
 	Quantity  int    `json:"quantity"`
+	Payment   int    `json:"payment"`
 }
 
 func (btr *BuyItemRequest) GetUUID() (uuid.UUID, error) {
